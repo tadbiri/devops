@@ -1,0 +1,31 @@
+- name: install httpd and start web on stapp servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: install httpd on all stapp servers
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+    - name: start httpd on all stapp servers
+      ansible.builtin.systemd:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: add welcome msg to webpage
+      ansible.builtin.blockinfile:
+        path: /var/www/html/index.html
+        create: true
+        block: |
+          Welcome to XfusionCorp!
+          This is Nautilus sample file, created using Ansible!
+          Please do not modify this file manually!
+    
+    - name: change web files permissions
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: 0755
+
+        
