@@ -1,0 +1,8 @@
+- name: create emty fime in stapp01
+  hosts: all
+  become: yes
+  tasks:
+    - name: create file
+      ansible.builtin.copy:
+        content: ""
+        dest: /tmp/file.txt
