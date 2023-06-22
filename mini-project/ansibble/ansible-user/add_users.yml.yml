@@ -1,0 +1,37 @@
+- name: create groups and users
+  hosts: stapp01
+  become: true
+  tasks:
+    - name: create admins group on stapp01
+      ansible.builtin.group:
+        name: admins
+        state: present
+
+    - name: create developers group on stapp01
+      ansible.builtin.group:
+        name: developers
+        state: present
+
+    - name: create admin users
+      ansible.builtin.user:
+        name: "{{ item }}"                                                                                          
+        password: "{{ 'GyQkFRVNr3' | password_hash ('sha512') }}"                                                   
+        groups: admins,wheel
+        state: present                                                                                              
+      loop:                                                                                                        
+      - rob
+      - david
+      - joy
+    
+    - name: create developers users
+      ansible.builtin.user:
+        name: "{{ item }}"                                                                                          
+        password: "{{ 'TmPcZjtRQx' | password_hash ('sha512') }}"                                                   
+        groups: developers
+        home: "/var/www/{{ item }}" 
+        state: present                                                                                              
+      loop:                                                                                                        
+      - tim
+      - ray
+      - jim
+      - mark

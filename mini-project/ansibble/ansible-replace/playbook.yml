@@ -1,0 +1,24 @@
+- name: replace strings
+  hosts: all
+  become: true
+  tasks:
+    - name: replace xFusionCorp to Nautilus
+      ansible.builtin.replace:
+        path: /opt/dba/blog.txt
+        regexp: 'xFusionCorp'
+        replace: 'Nautilus'
+      when: inventory_hostname == 'stapp01'
+
+    - name: replace xFusionCorp to Nautilus
+      ansible.builtin.replace:
+        path: /opt/dba/story.txt
+        regexp: 'Nautilus'
+        replace: 'KodeKloud'
+      when: inventory_hostname == 'stapp02'
+        
+    - name: replace xFusionCorp to Nautilus
+      ansible.builtin.replace:
+        path: /opt/dba/media.txt
+        regexp: 'KodeKloud'
+        replace: 'xFusionCorp Industries'
+      when: inventory_hostname == 'stapp03'

@@ -1,0 +1,46 @@
+---
+- name: manage ACL
+  hosts: all
+  become: true
+  tasks:
+    - name: create file on stapp01
+      ansible.builtin.copy:
+        dest: /opt/dba/blog.txt
+        content: ""
+      when: inventory_hostname == 'stapp01'
+    - name: file permission on stapp01
+      ansible.builtin.acl:
+        path: /opt/dba/blog.txt
+        entity: tony
+        etype: group
+        permissions: r
+        state: present
+      when: inventory_hostname == 'stapp01'
+
+    - name: create file on stapp02
+      ansible.builtin.copy:
+        dest: /opt/dba/story.txt
+        content: present
+      when: inventory_hostname == 'stapp02'
+    - name: file permission on stapp02
+      ansible.builtin.acl:
+        path: /opt/dba/story.txt
+        entity: steve
+        etype: user
+        permissions: rw
+        state: present
+      when: inventory_hostname == 'stapp02'
+    
+    - name: create file on stapp03
+      ansible.builtin.copy:
+        dest: /opt/dba/media.txt
+        content: present
+      when: inventory_hostname == 'stapp03'
+    - name: file permission on stapp03
+      ansible.builtin.acl:
+        path: /opt/dba/media.txt
+        entity: banner
+        etype: group
+        permissions: rw
+        state: present
+      when: inventory_hostname == 'stapp03'

@@ -1,0 +1,11 @@
+- name: create file 
+  hosts: all
+  become: true
+  tasks:
+    - name: empty file
+      file:
+        path: /tmp/appdata.txt 
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0777'
+        state: touch

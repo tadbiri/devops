@@ -1,0 +1,39 @@
+- name: install httpd and php
+  hosts: stapp01
+  become: true
+  tasks:
+    - name: install httpd and php
+      ansible.builtin.yum:
+        name: httpd,php
+        state: present
+ 
+    - name: change apache document root
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        line: "DocumentRoot /var/www/html/myroot"
+        regexp: '^DocumentRoot.'
+
+    - name: change apache <Directory >
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        line: "<Directory /var/www/html/myroot>"
+        regexp: '<Directory ./var/www.>'
+
+    - name: Creates directory
+      ansible.builtin.file:
+        path: /var/www/html/myroot
+        state: directory
+
+    - name: Copy phpinfo.php
+      ansible.builtin.template:
+        src: /home/thor/playbooks/templates/phpinfo.php.j2
+        dest: /var/www/html/myroot/phpinfo.php
+        owner: apache
+        group: apache
+        mode: "0775"
+
+    - name: start httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
