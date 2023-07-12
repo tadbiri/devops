@@ -1,0 +1,34 @@
+- name: create softlink
+  hosts: all
+  become: true
+  tasks:
+    - name: 'link and file on app01'
+      ansible.builtin.file:
+        path: /opt/data/blog.txt
+        state: touch
+        owner: tony
+        group: tony
+      when: inventory_hostname == 'stapp01'
+
+    - name: 'link and file on app02'
+      ansible.builtin.file:
+        path: /opt/data/story.txt
+        state: touch
+        owner: steve
+        group: steve
+      when: inventory_hostname == 'stapp02'
+
+    - name: 'link and file on app03'
+      ansible.builtin.file:
+        path: /opt/data/media.txt
+        state: touch
+        owner: banner
+        group: banner
+      when: inventory_hostname == 'stapp03'
+    
+    - name: 'create softlink'
+      ansible.builtin.file:
+        src: /opt/data/
+        dest: /var/www/html
+        state: link
+    

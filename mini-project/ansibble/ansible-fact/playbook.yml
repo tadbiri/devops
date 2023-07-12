@@ -1,0 +1,22 @@
+- name: ansible gathering facts
+  hosts: all
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: create fact.txt file on all app server
+      ansible.builtin.blockinfile:
+        create: yes
+        path: /root/facts.txt
+        block: |
+          Ansible managed node IP is {{ansible_default_ipv4.address}}
+    - name: install httpd
+      ansible.builtin.package:
+        name: httpd
+        state: present
+    - name: cp fact to html
+      shell: cp /root/facts.txt /var/www/html/index.html
+    - name: start enable httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
