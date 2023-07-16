@@ -1,0 +1,20 @@
+---
+# tasks file for role/test
+
+- name: install the latest version of HTTPD
+  yum:
+    name: httpd
+    state: latest
+
+- name: install index configuration file from template
+  template:
+    src: /home/thor/ansible/role/httpd/templates/index.html.j2
+    dest: /var/www/html/index.html
+    owner: '{{ansible_user}}'
+    group: '{{ansible_user}}'
+    mode: 0744
+
+- name: Start service httpd
+  service:
+    name: httpd
+    state: started

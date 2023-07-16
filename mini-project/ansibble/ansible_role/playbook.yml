@@ -1,0 +1,7 @@
+---
+- hosts: stapp01 
+  become: yes
+  become_user: root
+  roles:
+    - role/httpd
+  

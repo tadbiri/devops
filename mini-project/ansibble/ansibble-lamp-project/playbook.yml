@@ -1,0 +1,123 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install common pakages
+      yum:
+        name:
+        - libselinux-python
+        - libsemanage-python
+        - firewalld
+        state: installed
+
+  #install  databases
+- name: Install database
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: install mariadb and mysql-python
+      yum: 
+        name:
+        - mariadb-server
+        - MySQL-python
+        state: installed
+
+    - name: copy my.cnf
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+
+    - name: start and enable mariadb and firewalld
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+        - mariadb
+        - firewalld
+
+    - name: firewall config
+      firewalld:
+        port: "{{ mysql_port }}/tcp"
+        zone: public
+        state: enabled
+        permanent: yes
+        immediate: yes
+
+# deploy database and user
+- name: deploy database and user
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: create db
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+
+    - name: create user
+      mysql_user:
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        host: '172.20.1.100'
+        priv: '*.*:ALL'
+        state: present
+    
+    - name: copy db load files 
+      copy:
+        src: db-load-script.sql
+        dest: /tmp
+
+    - name: import to db 
+      shell: 'mysql -f < /tmp/db-load-script.sql'
+   
+# install web stack
+- name: deploy web stack on webserver
+  hosts: lampweb
+  become: yes
+  tasks:
+    - name: install packages
+      yum:
+        name:
+        - httpd
+        - php
+        - php-mysql
+        - git
+        state: installed
+
+    - name: start enable firewall
+      service: 
+         name: firewalld
+         state: started
+         enabled: yes
+
+    - name: allow http om firewall
+      firewalld:
+        port: "{{ httpd_port }}/tcp"
+        zone: public
+        state: enabled
+        permanent: yes
+        immediate: yes
+
+    - name: change index.html to index.php
+      tags: 'index.php'
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "DirectoryIndex index.html"
+        replace: "DirectoryIndex index.php"
+        
+    - name: Start and enable the httpd service
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Clone the source code from the repository
+      git:
+        repo: "{{ repository }}"
+        dest: /var/www/html/
+        force: yes
+
+    - name: Copy the custom index.php file
+      copy: 
+        src: files/index.php
+        dest: /var/www/html/index.php
