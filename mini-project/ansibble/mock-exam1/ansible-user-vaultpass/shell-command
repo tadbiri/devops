@@ -1,0 +1,1 @@
+ansible-vault encrypt_string --vault-password-file a_password_file 'foobar' --name 'the_secret'

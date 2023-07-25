@@ -1,0 +1,34 @@
+---
+- name: add users to node00
+  hosts: node00
+  gather_facts: no
+  vars:
+    admin_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          39653936613631383765623937666461363135633938306139353134653262323761666434663566
+          3661623933373561623864626464316561306662353530310a306634316665383230623366623266
+          34663733383334376132316630343265396134333465663932343938303836393331393836643562
+          6162383633653465660a363830376434313666643261393535613236663234353934633662643664
+          6237
+    developer_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          32663338346332363430613137646363663639616537643165623662633736353730303433353938
+          3339313235373030393164353534343334633138333364320a306464386130393638636636626163
+          31343339313834653337633730613664393562393935316532646431373638343936326264333436
+          6137376631393263350a653166633835633432303133393935316530623834666630346264363030
+          3366
+  tasks: 
+    - name: include data/users.yml
+      include_vars: data/users.yml
+    - name: add admin users
+      user:
+        name: "{{ item }}"
+        groups: wheel
+        password: "{{ admin_pass | string | password_hash('sha512') }}"
+      with_items: "{{ admins | list }}"
+    - name: add developer users
+      user:
+        name: "{{ item }}"
+        password: "{{ developer_pass | string | password_hash('sha512') }}"
+        home: /var/www/
+      with_items: "{{ developers | list }}"  
