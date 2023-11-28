@@ -1,0 +1,145 @@
+sudo apt-get update -y && \
+sudo apt-get upgrade -y && \
+sudo apt-get install haproxy
+
+
+
+
+wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+chmod +x cfssl*
+sudo mv cfssl_linux-amd64 /usr/local/bin/cfssl
+sudo mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+cfssl version
+
+
+
+vim kubernetes-csr.json
+{
+  "CN": "kubernetes",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+  {
+    "C": "IE",
+    "L": "Cork",
+    "O": "Kubernetes",
+    "OU": "Kubernetes",
+    "ST": "Cork Co."
+  }
+ ]
+}
+
+cfssl gencert \
+-ca=ca.pem \
+-ca-key=ca-key.pem \
+-config=ca-config.json \
+-hostname=192.168.56.11,192.168.56.12,127.0.0.1 \
+-profile=kubernetes kubernetes-csr.json | \
+cfssljson -bare kubernetes
+
+
+
+cat >> /root/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCmNqGiZFoqunY1fvq3OJFpknNxMlIdADFvBjQu7NrICzZb0NRysKxQ1NFc3dW07tGMB4eJTeCBCQh8DF5LwygbmjWYd5iZVcCsD9gDpzRtObigXnsbDsH/wABDMPiGTDzDibZlBs84fmvhgLDCP158cpAJDh0hPrL4jDrMHX/LWwOGq8lI6AmY0LiYMxRi4K1x4xQP5vQpJ037VPrOvyRJcsFaiAp3qQw6keTNGJce9mmw+ivoxLiNlnwjNs80sMIS2iK6bpsfQKKtpzWNVnhf2hfGCE8IQyYANnd7Sx7P396w/U4D9o8dzNcJAqETbFdEYoEVPL3yCXaYwLWZkQfMylniWMByhtxFffYJjsIAYJB4t1bW/XT2xrlcPKLWXIJeMp4TSUudgdnNLJdgFDkH9PqjxYMh0FTSS7Hcolyb1haNFDvzT/vIdVRU5DDQk7LCemtZDxsx+hqFZds+vOFPOkveJVO9MfZYUN74HZsdS2WpJHUhuiW62uduanraHvc= vagrant@loadbalancer
+EOF
+cat >> /home/vagrant/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCmNqGiZFoqunY1fvq3OJFpknNxMlIdADFvBjQu7NrICzZb0NRysKxQ1NFc3dW07tGMB4eJTeCBCQh8DF5LwygbmjWYd5iZVcCsD9gDpzRtObigXnsbDsH/wABDMPiGTDzDibZlBs84fmvhgLDCP158cpAJDh0hPrL4jDrMHX/LWwOGq8lI6AmY0LiYMxRi4K1x4xQP5vQpJ037VPrOvyRJcsFaiAp3qQw6keTNGJce9mmw+ivoxLiNlnwjNs80sMIS2iK6bpsfQKKtpzWNVnhf2hfGCE8IQyYANnd7Sx7P396w/U4D9o8dzNcJAqETbFdEYoEVPL3yCXaYwLWZkQfMylniWMByhtxFffYJjsIAYJB4t1bW/XT2xrlcPKLWXIJeMp4TSUudgdnNLJdgFDkH9PqjxYMh0FTSS7Hcolyb1haNFDvzT/vIdVRU5DDQk7LCemtZDxsx+hqFZds+vOFPOkveJVO9MfZYUN74HZsdS2WpJHUhuiW62uduanraHvc= vagrant@loadbalancer
+EOF
+
+cat >> /root/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCi243jl89sIKsAES4RvSEIOf6yG6xSfIqjh3sU77F49YciRTqnIi4DIWYNn+H/UfDjtVmUFRUlk+0Y2lt8FtQHmdIGuFJtepFnyslhj0gsifSlwZ8Pn0uOdnUIMzvGqautP64altwvefJPpBJTkoZlJqQkUI29h2sfX7wXFJ6xWkuAY2iIyMUevRhtF+YMTErIdCi4NSqx7mcTFW0XhnzMNbOZA0yk6RaWDaNHwFWp/oy7EzW6sGL1tMguRDTeljBaIqSHQBjihnO4s6K07PuACW8OY1RXNJ1aZqxm4uwdk2rynbtwKorVhvnc4Tov9HiFkX2OaEI9MqfHRaANVOzyypUMYlaRtlKcbumnNCrOs6cvtViLUnDOb3JEDN/apCRiZTfwUe4JhqYs3SuM2zLQWchPwJ/74gOdWPbnMaVvWhHCN9RojGIX3m5IJ4QR7nrrL+0hx9albuXk1lu5do3JKVEBffC528ejF4ytcHi7XaftYUi5GtjxFrbaBdEUX8k= root@loadbalancer
+EOF
+cat >> /home/vagrant/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCi243jl89sIKsAES4RvSEIOf6yG6xSfIqjh3sU77F49YciRTqnIi4DIWYNn+H/UfDjtVmUFRUlk+0Y2lt8FtQHmdIGuFJtepFnyslhj0gsifSlwZ8Pn0uOdnUIMzvGqautP64altwvefJPpBJTkoZlJqQkUI29h2sfX7wXFJ6xWkuAY2iIyMUevRhtF+YMTErIdCi4NSqx7mcTFW0XhnzMNbOZA0yk6RaWDaNHwFWp/oy7EzW6sGL1tMguRDTeljBaIqSHQBjihnO4s6K07PuACW8OY1RXNJ1aZqxm4uwdk2rynbtwKorVhvnc4Tov9HiFkX2OaEI9MqfHRaANVOzyypUMYlaRtlKcbumnNCrOs6cvtViLUnDOb3JEDN/apCRiZTfwUe4JhqYs3SuM2zLQWchPwJ/74gOdWPbnMaVvWhHCN9RojGIX3m5IJ4QR7nrrL+0hx9albuXk1lu5do3JKVEBffC528ejF4ytcHi7XaftYUi5GtjxFrbaBdEUX8k= root@loadbalancer
+EOF
+
+
+scp ca.pem kubernetes.pem kubernetes-key.pem master-1:~
+scp ca.pem kubernetes.pem kubernetes-key.pem master-2:~
+scp ca.pem kubernetes.pem kubernetes-key.pem worker-1:~
+scp ca.pem kubernetes.pem kubernetes-key.pem worker-2:~
+
+
+
+sudo mkdir /etc/etcd /var/lib/etcd
+sudo mv ~/ca.pem ~/kubernetes.pem ~/kubernetes-key.pem /etc/etcd
+wget https://github.com/etcd-io/etcd/releases/download/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz
+tar xvzf etcd-v3.3.13-linux-amd64.tar.gz
+sudo mv etcd-v3.3.13-linux-amd64/etcd* /usr/local/bin/
+
+
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos
+
+
+[Service]
+ExecStart=/usr/local/bin/etcd \
+  --name master-2 \
+  --cert-file=/etc/etcd/kubernetes.pem \
+  --key-file=/etc/etcd/kubernetes-key.pem \
+  --peer-cert-file=/etc/etcd/kubernetes.pem \
+  --peer-key-file=/etc/etcd/kubernetes-key.pem \
+  --trusted-ca-file=/etc/etcd/ca.pem \
+  --peer-trusted-ca-file=/etc/etcd/ca.pem \
+  --peer-client-cert-auth \
+  --client-cert-auth \
+  --initial-advertise-peer-urls https://192.168.56.12:2380 \
+  --listen-peer-urls https://192.168.56.12:2380 \
+  --listen-client-urls https://192.168.56.12:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://192.168.56.12:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster master-2=https://192.168.56.12:2380,master-1=https://192.168.56.11:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+{                                                                                                                                     root@master-1
+  sudo systemctl daemon-reload
+  sudo systemctl enable etcd
+  sudo systemctl start etcd
+}
+
+ca.pem  kubernetes-key.pem  kubernetes.pem
+
+sudo ETCDCTL_API=3 etcdctl member list \
+  --endpoints=https://192.168.56.11:2379 \
+  --cacert=/etc/etcd/ca.pem \
+  --cert=/etc/etcd/kubernetes.pem \
+  --key=/etc/etcd/kubernetes-key.pem
+
+
+
+  vim config.yaml
+
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: stable
+apiServerCertSANs:
+- 192.168.56.30
+controlPlaneEndpoint: "192.168.56.30:6443"
+etcd:
+  external:
+    endpoints:
+    - https://192.168.56.11:2379
+    - https://192.168.56.12:2379
+    caFile: /etc/etcd/ca.pem
+    certFile: /etc/etcd/kubernetes.pem
+    keyFile: /etc/etcd/kubernetes-key.pem
+networking:
+  podSubnet: 10.244.0.0/16
+apiServerExtraArgs:
+  apiserver-count: "3"
+
+
+sudo kubeadm init --config=config.yaml
