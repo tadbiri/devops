@@ -42,9 +42,3 @@ So far you have completed installation of maven software to support maven plugin
 - Configure java path
   - `Manage Jenkins` > `Global Tool Configuration` > `Maven`
 
-#### Next Steps
-
-- [x] [Configure Users & Groups in Jenkins](https://youtu.be/jZOqcB32dYM)
-- [x] [Secure your Jenkins Server](https://youtu.be/19FmJumnkDc)
-- [x] [Jenkins Plugin Installation](https://youtu.be/p_PqPBbjaZ4)
-- [x] [Jenkins Master-Slave Configuration](https://youtu.be/hwrYURP4O2k)
