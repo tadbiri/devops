@@ -1,9 +1,10 @@
 # How to deploy on tomcat server using maven
-Pre-requisites
-	1. Maven Server  [Get help here]
-	2. Tomcat Server [Get help here]
 
-Procedure
+##Pre-requisites
+	1. Maven Server
+	2. Tomcat Server
+ 
+##Procedure
 
 1. download archetype maven-archetype-webapp
 	```sh 
